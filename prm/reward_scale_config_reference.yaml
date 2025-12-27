@@ -1,0 +1,47 @@
+# 奖励尺度优化配置文件
+# 在原有配置基础上添加以下参数
+
+# === 奖励尺度优化参数 ===
+# 尺度估计参数
+scale_percentile: 95          # 用于尺度估计的百分位数
+scale_min: 1e-6              # 最小尺度值
+scale_max: 1e6               # 最大尺度值
+tau: 0.005                   # 指数移动平均的学习率
+
+# 偏好奖励配置
+pref_reward_scale: 1.0       # 偏好奖励基础尺度
+adaptive_reward_scaling: true # 是否启用自适应奖励尺度
+
+# 偏好损失函数配置
+preference_loss_type: "adaptive_logistic"  # 损失函数类型: relative_hinge, normalized_hinge, adaptive_logistic, bradley_terry
+preference_loss_temperature: 1.0           # 损失函数温度参数
+preference_loss_margin: 1.0               # hinge损失的margin参数
+
+# 奖励归一化权重
+env_reward_weight: 0.7       # 环境奖励权重
+pref_reward_weight: 0.3      # 偏好奖励权重
+reward_adaptation_rate: 0.01 # 权重自适应调整率
+
+# 尺度适应参数
+scale_adaptation_rate: 0.01  # 尺度适应调整率
+
+# === 使用说明 ===
+# 1. 将这些参数添加到你的主配置文件中
+# 2. 或者在训练时通过命令行参数覆盖:
+#    python train.py task=h1hand-walk-v0 preference_loss_type=adaptive_logistic
+# 3. 推荐的损失函数类型:
+#    - adaptive_logistic: 适用于大多数情况，自动调整温度
+#    - relative_hinge: 适用于Q值尺度变化较大的情况
+#    - normalized_hinge: 适用于需要严格归一化的情况
+#    - bradley_terry: 适用于偏好学习的经典场景
+
+# === 性能调优建议 ===
+# 如果训练不稳定，可以尝试:
+# - 降低tau值 (如0.001)
+# - 使用relative_hinge损失
+# - 调整env_reward_weight和pref_reward_weight的比例
+
+# 如果偏好学习效果不好，可以尝试:
+# - 增加preference_loss_temperature
+# - 使用adaptive_logistic损失
+# - 增加pref_reward_weight

@@ -1,0 +1,788 @@
+cache:
+  batch_size: 32
+  cache_size: 10000
+  cache_ttl: 86400
+  enable_cache: true
+  enable_disk_cache: true
+  enable_memory_cache: true
+  max_cache_size: 50000
+  max_workers: 4
+engine:
+  batch_size: 32
+  confidence_threshold: 0.1
+  max_confidence: 0.95
+  max_workers: 4
+  min_confidence: 0.2
+  parallel_processing: true
+  quality_weights:
+    action_smoothness: 0.2
+    activity_score: 0.15
+    state_stability: 0.2
+    survival_time: 0.3
+    task_progress: 0.15
+experimental:
+  ab_testing: false
+  adaptation_interval: 1000
+  adaptive_parameters: false
+  enable_experimental: false
+  learning_rate: 0.001
+  ml_enhancement: false
+  model_path: ./models/labeling_model.pkl
+  online_learning: false
+  test_ratio: 0.1
+  update_frequency: 100
+logging:
+  backup_count: 5
+  file_logging: true
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  level: INFO
+  log_file: ./logs/labeling_engine.log
+  max_log_size: 10MB
+  performance_log_interval: 100
+  performance_logging: true
+monitoring:
+  alerts:
+    high_error_rate: 0.1
+    low_cache_hit_rate: 0.5
+    slow_generation_time: 1.0
+  collect_metrics: true
+  enable_monitoring: true
+  export_format: json
+  export_interval: 300
+  export_metrics: false
+  metrics_interval: 60
+performance:
+  adaptive_batch_size: true
+  gc_interval: 1000
+  max_batch_size: 128
+  max_concurrent_requests: 100
+  max_memory_usage: 2GB
+  min_batch_size: 8
+  preload_cache: false
+  request_timeout: 30
+  warmup_samples: 100
+tasks:
+  cartpole_balance:
+    heuristic_rules:
+      use_action_smoothness: false
+      use_energy_efficiency: false
+      use_safety_score: true
+      use_state_stability: true
+      use_survival_time: true
+      use_task_progress: false
+    quality_weights:
+      action_smoothness: 0.1
+      activity_score: 0.05
+      safety_score: 0.1
+      state_stability: 0.25
+      survival_time: 0.5
+      task_progress: 0.0
+    task_specific_weights:
+      balance_stability: 0.6
+      minimal_movement: 0.4
+    thresholds:
+      min_balance_stability: 0.9
+      min_survival_time: 100
+  cheetah_run:
+    heuristic_rules:
+      use_action_smoothness: true
+      use_energy_efficiency: true
+      use_safety_score: true
+      use_state_stability: false
+      use_survival_time: true
+      use_task_progress: true
+    quality_weights:
+      action_smoothness: 0.15
+      activity_score: 0.15
+      safety_score: 0.05
+      state_stability: 0.1
+      survival_time: 0.2
+      task_progress: 0.35
+    task_specific_weights:
+      forward_progress: 0.35
+      running_efficiency: 0.25
+      running_speed_consistency: 0.4
+    thresholds:
+      min_running_speed: 5.0
+      min_survival_time: 40
+  default:
+    heuristic_rules:
+      use_action_smoothness: true
+      use_energy_efficiency: false
+      use_safety_score: true
+      use_state_stability: true
+      use_survival_time: true
+      use_task_progress: true
+    quality_weights:
+      action_smoothness: 0.15
+      activity_score: 0.15
+      safety_score: 0.05
+      state_stability: 0.15
+      survival_time: 0.25
+      task_progress: 0.25
+    task_specific_weights: {}
+    thresholds:
+      max_action_variance: 2.0
+      min_survival_time: 10
+      min_task_progress: 0.1
+      safety_threshold: 0.8
+  h1hand_balance_hard_v0:
+    heuristic_rules:
+      use_dont_move: true
+      use_legacy_rules: false
+      use_small_control: true
+      use_stand_reward: true
+    quality_weights:
+      dont_move: 0.4
+      small_control: 0.2
+      stand_reward: 0.4
+    task_specific_weights:
+      dont_move_reward: 0.4
+      small_control_reward: 0.2
+      standing_reward: 0.2
+      upright_reward: 0.2
+    thresholds:
+      height_margin: 0.4125
+      max_control_magnitude: 0.3
+      max_horizontal_velocity: 0.5
+      min_survival_time: 120
+      preference_threshold: 0.05
+      target_head_height: 2.02
+      target_upright_threshold: 0.9
+  h1hand_balance_simple_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_legacy_rules: false
+      use_standing_stability: true
+      use_static_stability: true
+    quality_weights:
+      control_efficiency: 0.45
+      standing_stability: 0.3
+      static_stability: 0.25
+    task_specific_weights:
+      control_efficiency_reward: 0.45
+      standing_stability_reward: 0.3
+      static_stability_reward: 0.25
+    thresholds:
+      max_control_magnitude: 0.3
+      max_position_variance: 0.05
+      min_survival_time: 100
+      preference_threshold: 0.05
+      target_standing_height: 1.5
+  h1hand_basketball_v0:
+    heuristic_rules:
+      use_ball_success: true
+      use_control_efficiency: true
+      use_hand_proximity: true
+      use_legacy_rules: false
+      use_standing_stability: true
+    quality_weights:
+      ball_success: 0.25
+      control_efficiency: 0.25
+      hand_proximity: 0.25
+      standing_stability: 0.25
+    task_specific_weights:
+      ball_success_reward: 0.25
+      hand_proximity_reward: 0.25
+      small_control_reward: 0.25
+      standing_reward: 0.25
+    thresholds:
+      max_ball_hoop_distance: 0.5
+      max_hand_ball_distance: 0.3
+      min_survival_time: 60
+      preference_threshold: 0.05
+      success_bonus_threshold: 1000
+      target_head_height: 1.65
+  h1hand_bookshelf_hard_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_manipulation_success: true
+      use_object_placement: true
+      use_stability_control: true
+    quality_weights:
+      manipulation_success: 0.45
+      object_placement: 0.35
+      stability_control: 0.2
+    task_specific_weights:
+      control_efficiency_reward: 0.2
+      object_distance_reward: 0.45
+      placement_accuracy_reward: 0.35
+    thresholds:
+      max_object_distance: 0.1
+      min_survival_time: 60
+      preference_threshold: 0.05
+      success_distance_threshold: 0.03
+  h1hand_bookshelf_simple_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_manipulation_success: true
+      use_object_placement: true
+      use_stability_control: true
+    quality_weights:
+      manipulation_success: 0.45
+      object_placement: 0.35
+      stability_control: 0.2
+    task_specific_weights:
+      control_efficiency_reward: 0.2
+      object_distance_reward: 0.45
+      placement_accuracy_reward: 0.35
+    thresholds:
+      max_object_distance: 0.1
+      min_survival_time: 40
+      preference_threshold: 0.05
+      success_distance_threshold: 0.05
+  h1hand_cabinet_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_door_manipulation: true
+      use_legacy_rules: false
+      use_object_placement: true
+      use_standing_stability: true
+      use_task_completion: true
+    quality_weights:
+      control_efficiency: 0.15
+      door_manipulation: 0.25
+      object_placement: 0.2
+      standing_stability: 0.25
+      task_completion: 0.15
+    task_specific_weights:
+      cabinet_control_efficiency: 0.15
+      cabinet_door_manipulation: 0.25
+      cabinet_object_placement: 0.2
+      cabinet_standing_stability: 0.25
+      cabinet_task_completion: 0.15
+    thresholds:
+      max_object_distance: 0.2
+      min_door_openness: 0.3
+      min_survival_time: 120
+      preference_threshold: 0.05
+      target_standing_height: 1.5
+  h1hand_crawl_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_crawling_posture: true
+      use_forward_motion: true
+      use_legacy_rules: false
+      use_orientation_stability: true
+    quality_weights:
+      control_efficiency: 0.15
+      crawling_posture: 0.4
+      forward_motion: 0.35
+      orientation_stability: 0.1
+    task_specific_weights:
+      crawl_control_efficiency: 0.15
+      crawl_forward_motion: 0.35
+      crawl_orientation_stability: 0.1
+      crawling_posture_stability: 0.4
+    thresholds:
+      max_crawl_height: 0.8
+      min_crawl_height: 0.3
+      min_forward_velocity: 0.1
+      min_survival_time: 100
+      preference_threshold: 0.05
+  h1hand_cube_v0:
+    heuristic_rules:
+      use_cube_closeness: true
+      use_legacy_rules: false
+      use_orientation_alignment: true
+      use_stable_control: true
+    quality_weights:
+      cube_closeness: 0.3
+      orientation_alignment: 0.5
+      stable_control: 0.2
+    task_specific_weights:
+      cube_closeness_reward: 0.3
+      orientation_alignment_reward: 0.5
+      small_control_reward: 0.2
+    thresholds:
+      cube_proximity_bounds:
+      - 0
+      - 0.1
+      cube_proximity_margin: 0.5
+      max_hand_cube_distance: 0.5
+      max_horizontal_velocity: 2.0
+      min_survival_time: 100
+      orientation_alignment_margin: 0.3
+      preference_threshold: 0.05
+      target_standing_height: 1.65
+      target_upright_threshold: 0.9
+  h1hand_door_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_door_openness: true
+      use_hand_proximity: true
+      use_hatch_manipulation: true
+      use_legacy_rules: false
+      use_passage_completion: true
+      use_standing_stability: true
+    quality_weights:
+      control_efficiency: 0.1
+      door_openness: 0.45
+      hand_proximity: 0.05
+      hatch_manipulation: 0.05
+      passage_completion: 0.35
+      standing_stability: 0.1
+    task_specific_weights:
+      door_hatch_openness_reward: 0.05
+      door_openness_reward: 0.45
+      hand_hatch_proximity_reward: 0.05
+      passage_reward: 0.35
+      stand_reward: 0.1
+    thresholds:
+      max_hand_hatch_distance: 0.25
+      min_survival_time: 80
+      preference_threshold: 0.05
+      target_door_openness: 1.0
+      target_hatch_openness: 0.75
+      target_passage_position: 1.2
+      target_standing_height: 1.65
+      target_upright_threshold: 0.9
+  h1hand_hurdle_v0:
+    heuristic_rules:
+      use_forward_progress: true
+      use_legacy_rules: false
+      use_obstacle_clearance: true
+      use_running_stability: true
+    quality_weights:
+      forward_progress: 0.25
+      obstacle_clearance: 0.25
+      running_stability: 0.5
+    task_specific_weights:
+      forward_progress_reward: 0.25
+      obstacle_clearance_reward: 0.25
+      running_stability_reward: 0.5
+    thresholds:
+      min_forward_progress: 0.5
+      min_obstacle_clearance: 0.8
+      min_survival_time: 30
+      preference_threshold: 0.05
+  h1hand_insert_normal_v0:
+    heuristic_rules:
+      use_approach_efficiency: true
+      use_force_control: true
+      use_insertion_accuracy: true
+      use_legacy_rules: false
+    quality_weights:
+      approach_efficiency: 0.3
+      force_control: 0.2
+      insertion_accuracy: 0.5
+    task_specific_weights:
+      approach_distance_reward: 0.3
+      force_efficiency_reward: 0.2
+      insertion_success_reward: 0.5
+    thresholds:
+      insertion_threshold: 0.03
+      max_approach_distance: 0.08
+      min_survival_time: 40
+      preference_threshold: 0.05
+  h1hand_insert_small_v0:
+    heuristic_rules:
+      use_approach_efficiency: true
+      use_force_control: true
+      use_insertion_accuracy: true
+      use_legacy_rules: false
+    quality_weights:
+      approach_efficiency: 0.3
+      force_control: 0.2
+      insertion_accuracy: 0.5
+    task_specific_weights:
+      approach_distance_reward: 0.3
+      force_efficiency_reward: 0.2
+      insertion_success_reward: 0.5
+    thresholds:
+      insertion_threshold: 0.02
+      max_approach_distance: 0.08
+      min_survival_time: 50
+      preference_threshold: 0.05
+  h1hand_kitchen_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_navigation_efficiency: true
+      use_object_interaction: true
+      use_task_completion: true
+    quality_weights:
+      navigation_efficiency: 0.2
+      object_interaction: 0.35
+      task_completion: 0.45
+    task_specific_weights:
+      completion_reward: 0.45
+      interaction_reward: 0.35
+      navigation_reward: 0.2
+    thresholds:
+      completion_threshold: 0.8
+      interaction_distance: 0.1
+      min_survival_time: 80
+      preference_threshold: 0.05
+  h1hand_maze_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_movement_efficiency: true
+      use_navigation_success: true
+      use_standing_stability: true
+    quality_weights:
+      movement_efficiency: 0.35
+      navigation_success: 0.4
+      standing_stability: 0.25
+    task_specific_weights:
+      checkpoint_approach_reward: 0.4
+      move_reward: 0.35
+      standing_reward: 0.25
+    thresholds:
+      min_survival_time: 80
+      optimal_move_speed: 0.3
+      preference_threshold: 0.05
+      target_head_height: 1.5
+  h1hand_package_v0:
+    heuristic_rules:
+      use_balance_control: true
+      use_legacy_rules: false
+      use_package_handling: true
+      use_transport_efficiency: true
+    quality_weights:
+      balance_control: 0.25
+      package_handling: 0.4
+      transport_efficiency: 0.35
+    task_specific_weights:
+      balance_stability_reward: 0.25
+      handling_success_reward: 0.4
+      transport_distance_reward: 0.35
+    thresholds:
+      handling_threshold: 0.05
+      min_survival_time: 60
+      preference_threshold: 0.05
+      transport_distance: 2.0
+  h1hand_pole_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_legacy_rules: false
+      use_movement_efficiency: true
+      use_standing_stability: true
+    quality_weights:
+      control_efficiency: 0.2
+      movement_efficiency: 0.35
+      standing_stability: 0.45
+    task_specific_weights:
+      move_reward: 0.35
+      small_control_reward: 0.2
+      standing_reward: 0.45
+    thresholds:
+      min_survival_time: 60
+      optimal_move_speed: 0.5
+      preference_threshold: 0.05
+      target_head_height: 1.5
+  h1hand_powerlift_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_lifting_strength: true
+      use_posture_stability: true
+      use_safety_control: true
+    quality_weights:
+      lifting_strength: 0.45
+      posture_stability: 0.35
+      safety_control: 0.2
+    task_specific_weights:
+      lift_success_reward: 0.45
+      posture_reward: 0.35
+      safety_reward: 0.2
+    thresholds:
+      lift_height_threshold: 0.5
+      min_survival_time: 50
+      posture_stability_threshold: 0.8
+      preference_threshold: 0.05
+  h1hand_push_v0:
+    heuristic_rules:
+      use_contact_efficiency: true
+      use_control_stability: true
+      use_legacy_rules: false
+      use_push_success: true
+    quality_weights:
+      contact_efficiency: 0.3
+      control_stability: 0.2
+      push_success: 0.5
+    task_specific_weights:
+      goal_distance_reward: 0.5
+      hand_distance_reward: 0.3
+      success_reward: 0.2
+    thresholds:
+      max_hand_distance: 0.15
+      min_survival_time: 40
+      preference_threshold: 0.05
+      success_distance_threshold: 0.05
+  h1hand_reach_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_motion_efficiency: true
+      use_reaching_accuracy: true
+      use_torso_stability: true
+    quality_weights:
+      motion_efficiency: 0.2
+      reaching_accuracy: 0.5
+      torso_stability: 0.3
+    task_specific_weights:
+      hand_dist_reward: 0.5
+      healthy_reward: 0.3
+      motion_penalty_reward: 0.2
+    thresholds:
+      max_motion_penalty: 100.0
+      min_survival_time: 30
+      preference_threshold: 0.05
+      target_hand_distance: 0.05
+  h1hand_room_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_navigation_success: true
+      use_obstacle_avoidance: true
+      use_path_efficiency: true
+    quality_weights:
+      navigation_success: 0.4
+      obstacle_avoidance: 0.35
+      path_efficiency: 0.25
+    task_specific_weights:
+      avoidance_reward: 0.35
+      efficiency_reward: 0.25
+      navigation_reward: 0.4
+    thresholds:
+      collision_penalty_threshold: 0.05
+      min_survival_time: 70
+      navigation_threshold: 0.1
+      preference_threshold: 0.05
+  h1hand_run_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_high_speed_motion: true
+      use_legacy_rules: false
+      use_standing_stability: true
+    quality_weights:
+      control_efficiency: 0.25
+      high_speed_motion: 0.4
+      standing_stability: 0.35
+    task_specific_weights:
+      move_reward: 0.4
+      small_control_reward: 0.25
+      standing_reward: 0.35
+    thresholds:
+      min_survival_time: 40
+      preference_threshold: 0.05
+      target_control_magnitude: 0.5
+      target_head_height: 1.65
+      target_run_speed: 5.0
+  h1hand_sit_hard_v0:
+    heuristic_rules:
+      use_balance_control: true
+      use_legacy_rules: false
+      use_posture_maintenance: true
+      use_sitting_stability: true
+    quality_weights:
+      balance_control: 0.3
+      posture_maintenance: 0.25
+      sitting_stability: 0.45
+    task_specific_weights:
+      balance_reward: 0.3
+      posture_reward: 0.25
+      sitting_reward: 0.45
+    thresholds:
+      balance_threshold: 0.8
+      min_survival_time: 80
+      preference_threshold: 0.05
+      sitting_height_threshold: 0.4
+  h1hand_sit_simple_v0:
+    heuristic_rules:
+      use_control_stability: true
+      use_legacy_rules: false
+      use_position_accuracy: true
+      use_sitting_quality: true
+    quality_weights:
+      control_stability: 0.25
+      position_accuracy: 0.3
+      sitting_quality: 0.45
+    task_specific_weights:
+      control_stability_reward: 0.25
+      on_chair_reward: 0.3
+      sitting_reward: 0.45
+    thresholds:
+      max_movement_velocity: 0.5
+      max_position_error: 0.1
+      min_survival_time: 80
+      preference_threshold: 0.05
+      target_sitting_height: 0.6
+  h1hand_slide_v0:
+    heuristic_rules:
+      use_landing_stability: true
+      use_legacy_rules: false
+      use_momentum_management: true
+      use_sliding_control: true
+    quality_weights:
+      landing_stability: 0.25
+      momentum_management: 0.35
+      sliding_control: 0.4
+    task_specific_weights:
+      landing_reward: 0.25
+      momentum_reward: 0.35
+      sliding_reward: 0.4
+    thresholds:
+      landing_stability_threshold: 0.8
+      min_survival_time: 40
+      preference_threshold: 0.05
+      sliding_distance_threshold: 3.0
+  h1hand_spoon_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_manipulation_precision: true
+      use_object_control: true
+      use_task_completion: true
+    quality_weights:
+      manipulation_precision: 0.45
+      object_control: 0.35
+      task_completion: 0.2
+    task_specific_weights:
+      completion_reward: 0.2
+      control_reward: 0.35
+      precision_reward: 0.45
+    thresholds:
+      control_stability_threshold: 0.8
+      min_survival_time: 50
+      precision_threshold: 0.02
+      preference_threshold: 0.05
+  h1hand_stair_v0:
+    heuristic_rules:
+      use_climbing_stability: true
+      use_control_efficiency: true
+      use_forward_motion: true
+      use_legacy_rules: false
+    quality_weights:
+      climbing_stability: 0.4
+      control_efficiency: 0.25
+      forward_motion: 0.35
+    task_specific_weights:
+      move_reward: 0.35
+      small_control_reward: 0.25
+      standing_reward: 0.4
+    thresholds:
+      min_survival_time: 60
+      preference_threshold: 0.05
+      target_control_magnitude: 0.5
+      target_forward_speed: 1.0
+      target_head_height: 1.2
+  h1hand_stand_v0:
+    heuristic_rules:
+      use_control_efficiency: true
+      use_legacy_rules: false
+      use_minimal_movement: true
+      use_standing_stability: true
+    quality_weights:
+      control_efficiency: 0.2
+      minimal_movement: 0.35
+      standing_stability: 0.45
+    task_specific_weights:
+      dont_move_reward: 0.35
+      small_control_reward: 0.2
+      standing_reward: 0.45
+    thresholds:
+      max_horizontal_velocity: 0.5
+      min_survival_time: 100
+      preference_threshold: 0.05
+      target_control_magnitude: 0.3
+      target_head_height: 1.65
+  h1hand_truck_v0:
+    heuristic_rules:
+      use_legacy_rules: false
+      use_package_manipulation: true
+      use_package_table_proximity: true
+      use_robot_package_proximity: true
+      use_standing_stability: true
+      use_task_completion: true
+    quality_weights:
+      package_manipulation: 0.3
+      package_table_proximity: 0.2
+      robot_package_proximity: 0.2
+      standing_stability: 0.2
+      task_completion: 0.1
+    task_specific_weights:
+      package_pickup_reward: 0.1
+      package_place_reward: 0.1
+      package_table_reward: 0.2
+      robot_package_picked_reward: 0.2
+      robot_package_truck_reward: 0.2
+      upright_reward: 0.2
+    thresholds:
+      max_package_table_distance: 0.2
+      max_robot_package_distance: 0.2
+      min_survival_time: 100
+      package_pickup_height: 0.1
+      preference_threshold: 0.05
+      target_upright_threshold: 0.9
+  h1hand_walk_v0:
+    heuristic_rules:
+      use_action_efficiency: true
+      use_forward_motion: true
+      use_legacy_rules: false
+      use_survival_stability: true
+    quality_weights:
+      action_efficiency: 0.25
+      forward_motion: 0.35
+      survival_stability: 0.4
+    task_specific_weights:
+      move_reward: 0.35
+      small_control_reward: 0.25
+      standing_reward: 0.25
+      upright_reward: 0.15
+    thresholds:
+      max_forward_distance: 10.0
+      min_survival_time: 50
+      preference_threshold: 0.05
+      target_control_magnitude: 0.5
+      target_forward_speed: 1.0
+      target_head_height: 1.3
+  h1hand_window_v0:
+    heuristic_rules:
+      use_force_application: true
+      use_legacy_rules: false
+      use_stability_maintenance: true
+      use_window_operation: true
+    quality_weights:
+      force_application: 0.35
+      stability_maintenance: 0.2
+      window_operation: 0.45
+    task_specific_weights:
+      force_efficiency_reward: 0.35
+      operation_success_reward: 0.45
+      stability_reward: 0.2
+    thresholds:
+      force_threshold: 10.0
+      min_survival_time: 45
+      operation_threshold: 0.8
+      preference_threshold: 0.05
+  walker_walk:
+    heuristic_rules:
+      use_action_smoothness: true
+      use_energy_efficiency: true
+      use_safety_score: true
+      use_state_stability: false
+      use_survival_time: true
+      use_task_progress: true
+    quality_weights:
+      action_smoothness: 0.2
+      activity_score: 0.1
+      safety_score: 0.05
+      state_stability: 0.1
+      survival_time: 0.3
+      task_progress: 0.25
+    task_specific_weights:
+      balance_stability: 0.25
+      forward_progress: 0.35
+      gait_quality: 0.4
+    thresholds:
+      min_forward_progress: 0.3
+      min_survival_time: 50
+validation:
+  auto_report: true
+  enable_validation: true
+  report_interval: 1000
+  thresholds:
+    consistency_threshold: 0.7
+    max_bias_ratio: 0.8
+    min_confidence: 0.3
+    min_diversity: 0.2
+    min_valid_ratio: 0.8
+    outlier_threshold: 2.0
+  validation_level: standard

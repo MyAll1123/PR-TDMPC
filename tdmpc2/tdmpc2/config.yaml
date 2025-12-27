@@ -1,0 +1,507 @@
+defaults:
+    - override hydra/launcher: submitit_local
+
+# environment
+task: dog-run
+obs: state
+
+# evaluation
+checkpoint: ???
+eval_episodes: 1
+eval_freq: 50000
+
+# training
+steps: 10_000_000
+batch_size: 256
+reward_coef: 0.1
+value_coef: 0.1
+consistency_coef: 20
+rho: 0.5
+lr: 3e-4
+enc_lr_scale: 0.3
+grad_clip_norm: 20
+tau: 0.01
+discount_denom: 5
+discount_min: 0.95
+discount_max: 0.995
+buffer_size: 3_000_000
+exp_name: default
+data_dir: ???
+
+# planning
+mpc: true
+iterations: 6
+num_samples: 512
+num_elites: 64
+num_pi_trajs: 24
+horizon: 3
+min_std: 0.05
+max_std: 2
+temperature: 0.5
+
+# actor
+log_std_min: -10
+log_std_max: 2
+entropy_coef: 1e-4
+
+# critic
+num_bins: 101
+vmin: -10
+vmax: +10
+
+# architecture
+model_size: ???
+num_enc_layers: 2
+enc_dim: 256
+num_channels: 32
+mlp_dim: 512
+latent_dim: 512
+task_dim: 96
+num_q: 5
+dropout: 0.01
+simnorm_dim: 8
+
+# logging
+wandb_project: humanoid-bench
+wandb_entity: robot-learning
+wandb_silent: false
+disable_wandb: true
+save_csv: true
+
+# misc
+save_video: true
+save_agent: true
+seed: 1
+
+# convenience
+work_dir: ???
+task_title: ???
+multitask: ???
+tasks: ???
+obs_shape: ???
+action_dim: ???
+episode_length: ???
+obs_shapes: ???
+action_dims: ???
+episode_lengths: ???
+seed_steps: ???
+bin_size: ???
+
+# humanoid envs
+policy_path: ???
+mean_path: ???
+var_path: ???
+policy_type: ???
+small_obs: ???
+
+
+# 偏好学习基础参数
+use_preference_engine: true  # 是否启用偏好学习引擎
+preference_enabled: true  # 偏好学习总开关
+
+# 优先级经验回放配置 - Prioritized Experience Replay
+prioritized_experience_replay:
+  # 基础开关
+  enabled: true  # 启用优先级经验回放（默认关闭，需要手动开启）
+  
+  # 潜空间偏好模型配置 - Transformer架构参数
+  preference_model:
+    # 模型架构
+    latent_dim: 512  # TD-MPC2的潜空间维度
+    action_dim: 61   # 动作维度
+    hidden_dim: 256  # 隐藏层维度
+    n_transformer_layers: 2  # Transformer层数
+    n_attention_heads: 4     # 注意力头数
+    dropout: 0.1   # Dropout率
+    max_seq_len: 1000  # 最大序列长度
+    
+    # 训练参数
+    learning_rate: 1e-3  # 学习率
+    batch_size: 64
+    temperature: 1.0  # Bradley-Terry温度参数
+    label_smoothing: 0.05  # 标签平滑
+    weight_decay: 1e-4  # 权重衰减
+    
+    # 不确定性估计
+    enable_uncertainty: true  # 启用不确定性估计
+    uncertainty_method: "ensemble"  # 不确定性方法："ensemble" 或 "dropout"
+  
+  # 缓冲池配置
+  buffer_capacity: 1000  # 经验回放缓冲池容量
+  min_buffer_size: 100  # 开始训练的最小缓冲池大小
+  batch_size: 64  # 训练批次大小
+  
+  # 优先级计算配置
+  priority_config:
+    # 置信度优先级参数
+    confidence_weight: 0.7  # 置信度优先级权重
+    confidence_temperature: 1.0  # 置信度计算温度参数
+    min_confidence_priority: 0.1  # 最小置信度优先级
+    max_confidence_priority: 10.0  # 最大置信度优先级
+    
+    # 时间优先级参数
+    time_weight: 1.0  # 时间优先级权重
+    time_decay_factor: 0.99  # 时间衰减因子
+    min_time_priority: 0.1  # 最小时间优先级
+    max_time_priority: 2.0  # 最大时间优先级
+    
+    # 综合优先级参数
+    priority_epsilon: 1e-6  # 优先级计算的小常数
+    priority_alpha: 0.6  # 优先级指数（控制优先级的重要性）
+    priority_beta: 0.4  # 重要性采样指数（从0.4线性增长到1.0）
+    priority_beta_increment: 1e-6  # beta增长率
+    
+  # 损失更新配置
+  loss_update_config:
+    # 损失到优先级的映射
+    loss_priority_mapping: "exponential"  # 映射方式: linear, exponential, log
+    loss_scale_factor: 1.0  # 损失缩放因子
+    loss_offset: 0.01  # 损失偏移量（避免零优先级）
+    
+    # 优先级更新策略
+    priority_update_strategy: "immediate"  # 更新策略: immediate, batch, delayed
+    max_priority_update_ratio: 2.0  # 单次更新的最大优先级变化比例
+    priority_smoothing_factor: 0.1  # 优先级平滑因子
+    
+  # 采样配置
+  sampling_config:
+    # 采样策略
+    sampling_strategy: "proportional"  # 采样策略: proportional, rank_based
+    temperature: 1.0  # 采样温度
+    
+    # 重要性采样
+    importance_sampling: true  # 启用重要性采样
+    max_importance_weight: 10.0  # 最大重要性权重
+    
+    # 采样平衡
+    balance_sampling: true  # 启用采样平衡
+    min_sample_probability: 0.001  # 最小采样概率
+    
+    # 质量感知采样配置
+    enable_quality_sampling: true  # 启用质量感知采样
+    high_quality_boost: 2.0  # 高质量经验的采样权重提升倍数
+    
+    # 高质量经验识别阈值 - 基于环境自适应
+    quality_thresholds:
+      confidence_threshold: 0.7 # 置信度阈值（保持固定，因为是概率值）
+      # 规则得分差异 - 改为相对于环境平均奖励的倍数
+      rule_score_diff_multiplier: 0.5  # 规则得分差异倍数（相对于环境平均奖励绝对值）
+      rule_score_diff_min_threshold: 1.0  # 最小差异阈值（避免过小的差异）
+      # 环境奖励差异 - 改为标准差倍数
+      env_reward_diff_std_multiplier: 1.5  # 环境奖励差异标准差倍数
+      env_reward_diff_percentile_threshold: 75.0  # 百分位数阈值（保持百分比形式）
+      max_sample_count: 10  # 最大采样次数（避免过度采样）
+      min_quality_indicators: 2  # 最少满足的质量指标数量
+      # 信号强度相关参数
+      weak_signal_std_multiplier: 0.1  # 弱信号标准差倍数
+      strong_signal_std_multiplier: 1.0  # 强信号标准差倍数
+      stability_std_multiplier: 0.5  # 稳定性标准差倍数
+      significance_mean_multiplier: 0.1  # 显著性均值倍数
+    
+  # 训练配置
+  training_config:
+    # 训练频率
+    train_every_n_episodes: 10  # 每N个回合训练一次
+    train_steps_per_update: 1  # 每次更新的训练步数
+    
+    # 偏好模型配置
+    preference_model_lr: 3e-4  # 偏好模型学习率
+    preference_model_weight_decay: 1e-5  # 权重衰减
+    preference_model_grad_clip: 1.0  # 梯度裁剪
+    
+    # 早停配置
+    early_stopping_patience: 10  # 早停耐心值
+    early_stopping_min_delta: 1e-4  # 早停最小改进
+  
+  # 偏好对生成配置
+  preference_pair_generation:
+    # 轨迹缓存配置
+    trajectory_cache_size: 100  # 轨迹缓存区上限
+    clear_cache_on_full: true   # 达到上限时清空缓存
+    
+    # 偏好对生成数量
+    pairs_per_generation: 20    # 每次生成的偏好对数量
+    
+    # 生成方式配置
+    generation_methods:
+      # DPO方法配置
+      dpo:
+        enabled: true
+        ratio: 0.4              # DPO方法占比
+        confidence_threshold: 0.80 # 置信度阈值（保持固定，因为是概率值）
+      
+      # 质量方法配置
+      quality:
+        enabled: true
+        ratio: 0.4              # 质量方法占比
+        # 质量分数差异 - 改为相对于环境平均奖励的倍数
+        score_diff_multiplier: 0.3  # 质量分数差异倍数（相对于环境平均奖励绝对值）
+        score_diff_min_threshold: 2.0  # 最小差异阈值（避免过小的差异）
+      
+      # 混合方法配置
+      hybrid:
+        enabled: true
+        ratio: 0.2              # 混合方法占比
+        dpo_weight: 0.6         # DPO权重
+        quality_weight: 0.4     # 质量权重
+    
+    # 轨迹选择配置
+    trajectory_selection:
+      selection_pool_size: 50   # 选择池大小
+      min_trajectory_length: 10 # 最小轨迹长度
+      max_trajectory_length: 1000 # 最大轨迹长度
+    
+  # 性能配置
+  performance_config:
+    # 内存管理
+    max_memory_usage_mb: 2048.0  # 最大内存使用量(MB)
+    memory_check_interval: 100  # 内存检查间隔
+    auto_cleanup_enabled: true  # 启用自动清理
+    
+    # 性能监控
+    performance_monitoring: true  # 启用性能监控
+    performance_check_interval: 100  # 性能检查间隔
+    log_performance_stats: true  # 记录性能统计
+    
+  # 集成配置
+  integration_config:
+    # 集成模式
+    integration_mode: "prioritized_only"  # 集成模式: prioritized_only, hybrid, legacy_fallback
+    
+    # 混合模式权重（仅在hybrid模式下有效）
+    prioritized_weight: 0.8  # 优先级系统权重
+    legacy_weight: 0.2  # 传统系统权重
+    
+    # 回退配置
+    fallback_to_legacy: true  # 出错时回退到传统方法
+    fallback_error_threshold: 5  # 触发回退的错误次数阈值
+    
+    # 兼容性
+    enable_legacy_compatibility: true  # 启用传统系统兼容性
+    legacy_system_timeout: 30.0  # 传统系统超时时间(秒)
+    
+  # 调试配置
+  debug_config:
+    # 日志配置
+    log_level: "INFO"  # 日志级别: DEBUG, INFO, WARNING, ERROR
+    log_priority_updates: false  # 记录优先级更新
+    log_sampling_details: false  # 记录采样详情
+    
+    # 统计配置
+    save_statistics: true  # 保存统计信息
+    statistics_save_interval: 1000  # 统计保存间隔
+    
+    # 可视化配置
+    enable_priority_visualization: false  # 启用优先级可视化
+    visualization_save_interval: 5000  # 可视化保存间隔
+
+# 奖励尺度优化配置
+reward_scale_optimization:
+  # 基础开关
+  enabled: true  # 启用奖励尺度优化
+  
+  # 尺度估计参数
+  scale_percentile: 95  # 用于尺度估计的百分位数
+  scale_min: 1e-6  # 最小尺度值
+  scale_max: 1e6   # 最大尺度值
+  scale_tau: 0.005  # EMA学习率
+  
+  # 偏好奖励配置
+  pref_reward_scale: 1.0  # 偏好奖励基础尺度
+  adaptive_reward_scaling: true  # 启用自适应奖励尺度
+  
+  # 偏好损失函数配置
+  preference_loss_type: 'adaptive_logistic'  # 损失类型: relative_hinge, normalized_hinge, adaptive_logistic, bradley_terry
+  preference_loss_temperature: 1.0  # 损失函数温度参数
+  preference_loss_margin: 1.0  # hinge损失的边界参数
+  
+  # 奖励归一化权重
+  env_reward_weight: 0.7  # 环境奖励权重
+  pref_reward_weight: 0.3  # 偏好奖励权重
+  reward_adaptation_rate: 0.01  # 奖励权重自适应调整率
+  
+  # 尺度适应参数
+  scale_adaptation_rate: 0.01  # 尺度自适应调整率
+  small_reward_threshold: 0.01  # 小奖励阈值（相对于尺度）
+  small_reward_scale_factor: 0.1  # 小奖励归一化因子
+track_preference_variance: true  # 跟踪偏好方差
+
+# model saving
+save_freq: 10000  # 每多少步保存一次模型
+
+# elite trajectory system configuration - 精英轨迹系统配置
+elite_trajectory_system:
+  # 轨迹生成配置
+  total_trajectories: 256  # 总轨迹数量
+  elite_trajectories: 64   # 精英轨迹数量
+  max_trajectory_length: 1000  # 最大轨迹长度
+  min_trajectory_length: 10    # 最小轨迹长度
+  
+  # 生成策略参数
+  exploration_noise_std: 0.1  # 探索噪声标准差
+  temperature: 1.0            # 采样温度
+  diversity_weight: 0.2       # 多样性权重
+  
+  # 精英选择策略
+  selection_method: "hybrid"  # reward_based, quality_based, hybrid
+  reward_weight: 0.7          # 奖励权重
+  quality_weight: 0.3         # 质量权重
+  quality_threshold: 0.75     # 质量阈值（第二阶段优化值）
+  
+
+  quality_score_weight: 0.3
+  environment_reward_weight: 0.2
+  diversity_bonus_weight: 0.1
+  
+  # 系统配置
+  enable_value_estimation: true
+  enable_uncertainty_estimation: true
+  enable_detailed_analysis: true
+  
+  # 保存配置
+  save_trajectories: true
+  save_values: true
+  output_dir: "./elite_trajectory_outputs"
+  
+  # 并行处理
+  max_workers: 4
+  batch_size: 32
+  
+  # 价值估计详细配置
+  value_estimation:
+    # 价值计算参数
+    discount_factor: 0.99            # 折扣因子
+    normalize_rewards: true          # 是否归一化奖励
+    use_advantage_estimation: true   # 是否使用优势估计
+    
+    # 多样性计算参数
+    diversity_metric: "action_entropy" # 多样性度量: action_entropy, state_coverage, trajectory_distance
+    diversity_window: 10             # 多样性计算窗口
+    
+    # 不确定性估计参数
+    uncertainty_method: "ensemble"   # 不确定性方法: ensemble, dropout, bayesian
+    num_samples: 10                  # 采样数量（用于不确定性估计）
+    
+    # 时间衰减参数
+    enable_temporal_decay: true      # 是否启用时间衰减
+    decay_rate: 0.95                 # 衰减率
+    
+    # 价值估计批处理大小
+    estimation_batch_size: 16        # 价值估计批处理大小
+  
+  # 混合价值估计配置 - MPC与偏好奖励融合
+  hybrid_value_estimation:
+    # 基础权重
+    base_mpc_weight: 0.6             # MPC原生价值权重
+    base_preference_weight: 0.4      # 偏好奖励权重（从0.3提升到0.4）
+    
+    # 自适应调整
+    enable_adaptive_weighting: true  # 启用自适应权重调整
+    quality_sensitivity: 0.3         # 质量敏感度（提升响应性）
+    uncertainty_sensitivity: 0.2     # 不确定性敏感度（提升响应性）
+    stage_sensitivity: 0.15          # 阶段敏感度（提升响应性）
+    confidence_sensitivity: 0.25     # 置信度敏感度（新增）
+    trend_sensitivity: 0.15          # 奖励趋势敏感度（新增）
+    
+    # 权重范围限制
+    min_preference_weight: 0.2       # 最小偏好权重
+    max_preference_weight: 0.7       # 最大偏好权重
+    
+    # 训练阶段配置
+    early_stage_episodes: 500        # 早期阶段episode数
+    mid_stage_episodes: 1500         # 中期阶段episode数
+    
+    # 偏好计算
+    preference_horizon: 30           # 偏好评估的时间窗口
+    preference_batch_size: 32        # 偏好计算批次大小
+    enable_preference_caching: true  # 启用偏好缓存
+    
+    # 不确定性量化
+    enable_uncertainty_penalty: true # 启用不确定性惩罚
+    uncertainty_penalty_scale: 0.1   # 不确定性惩罚缩放
+    confidence_threshold: 0.80      # 置信度阈值（保持固定，因为是概率值）
+    
+    # 奖励平滑配置
+    enable_reward_smoothing: true    # 启用奖励平滑
+    ema_alpha: 0.3                   # EMA衰减因子
+    smoothing_window_size: 30        # 移动平均窗口大小
+    ema_weight: 0.7                  # EMA权重（与移动平均组合）
+    ma_weight: 0.3                   # 移动平均权重
+    
+    # 质量提升机制
+    enable_quality_bonus: true       # 启用质量奖励加成
+    quality_bonus_threshold: 0.6     # 质量奖励阈值（保持固定，因为是相对质量分数）
+    quality_bonus_amount: 0.1        # 质量奖励加成数量
+    
+    # 性能优化
+    enable_parallel_computation: true # 启用并行计算
+    computation_timeout: 0.1         # 计算超时（秒）
+    
+    # 渐进式信号增强配置
+    enable_signal_enhancement: true  # 启用信号增强
+    enhancement_early_factor: 0.8    # 早期阶段增强因子
+    enhancement_mid_factor: 1.2      # 中期阶段增强因子
+    enhancement_late_factor: 1.3     # 后期阶段增强因子
+    
+    # 信号质量过滤 - 改为相对于奖励标准差的倍数
+    weak_signal_std_multiplier: 0.1   # 弱信号标准差倍数（相对于环境奖励标准差）
+    weak_signal_suppression: 0.5     # 弱信号抑制因子
+    strong_signal_std_multiplier: 1.0 # 强信号标准差倍数（相对于环境奖励标准差）
+    max_quality_factor: 1.5          # 最大质量增强因子
+    
+    # 动态放大配置
+    min_amplification: 0.5           # 最小放大因子
+    max_amplification: 2.0           # 最大放大因子
+    # 稳定性和显著性 - 改为相对于环境奖励统计的倍数
+    stability_std_multiplier: 0.5    # 稳定性标准差倍数（相对于环境奖励标准差）
+    significance_mean_multiplier: 0.1 # 显著性均值倍数（相对于环境平均奖励绝对值）
+    
+    # 噪声抑制配置
+    noise_smoothing_window: 30        # 噪声平滑窗口大小
+    noise_detection_threshold: 0.5   # 噪声检测阈值
+    smoothing_weight: 0.3            # 平滑权重
+  
+  # 偏好感知规划配置
+  enable_preference_planning: true   # 启用偏好感知规划
+  preference_planning_mode: "hybrid" # 偏好规划模式: hybrid, preference_only, mpc_only
+
+# 偏好对生成配置
+preference_pair_generation:
+  # 轨迹缓存配置
+  trajectory_cache_size: 100          # 轨迹缓存区大小
+  clear_cache_when_full: true         # 达到上限时是否清空缓存
+  
+  # 偏好对生成数量配置
+  pairs_per_generation: 20            # 每次生成的偏好对数量
+  
+  # 轨迹选择配置
+  trajectory_selection:
+    pool_size: 30                     # 轨迹选择池大小
+    min_trajectory_length: 10         # 最小轨迹长度
+    max_trajectory_length: 1000       # 最大轨迹长度
+  
+  # DPO方法配置
+  dpo_method:
+    enabled: true                     # 是否启用DPO方法
+    ratio: 0.4                        # DPO方法占比
+    confidence_threshold: 0.80       # 置信度阈值（保持固定，因为是概率值）
+    weight: 1.0                       # 权重
+  
+  # 质量方法配置
+  quality_method:
+    enabled: true                     # 是否启用质量方法
+    ratio: 0.3                        # 质量方法占比
+    # 质量分数差异 - 改为相对于环境平均奖励的倍数
+    score_diff_multiplier: 0.3        # 质量分数差异倍数（相对于环境平均奖励绝对值）
+    score_diff_min_threshold: 2.0     # 最小差异阈值（避免过小的差异）
+    weight: 1.0                       # 权重
+  
+  # 混合方法配置
+  hybrid_method:
+    enabled: true                     # 是否启用混合方法
+    ratio: 0.3                        # 混合方法占比
+    confidence_threshold: 0.80       # 置信度阈值（保持固定，因为是概率值）
+    # 质量分数差异 - 改为相对于环境平均奖励的倍数
+    score_diff_multiplier: 0.3        # 质量分数差异倍数（相对于环境平均奖励绝对值）
+    score_diff_min_threshold: 2.0     # 最小差异阈值（避免过小的差异）
+    weight: 1.0                       # 权重
